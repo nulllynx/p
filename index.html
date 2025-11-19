@@ -81,6 +81,60 @@
             background: #00C2FF; 
         }
 
+        /* CUSTOM CURSOR - UNIQUE HACKER THEME */
+        body {
+            cursor: none; /* Hide default cursor completely */
+        }
+        
+        /* Ensure interactive elements don't show default cursor */
+        a, button, input, textarea, select, .cursor-pointer {
+            cursor: none;
+        }
+
+        /* The central dot */
+        #cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00C2FF;
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            pointer-events: none;
+            box-shadow: 0 0 10px #00C2FF;
+        }
+
+        /* The trailing ring */
+        #cursor-ring {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(0, 194, 255, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            pointer-events: none;
+            transition: width 0.3s, height 0.3s, background-color 0.3s, border-color 0.3s, border-radius 0.3s;
+        }
+
+        /* Hover State for Cursor */
+        body.hover-active #cursor-ring {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 194, 255, 0.1);
+            border-color: transparent;
+            border-radius: 30%; /* Morphs into a squircle */
+            backdrop-filter: blur(2px);
+        }
+        
+        body.hover-active #cursor-dot {
+            transform: translate(-50%, -50%) scale(0.5); /* Shrink dot on hover */
+        }
+
         /* Utility classes */
         .text-shadow-glow {
             text-shadow: 0 0 10px rgba(0, 194, 255, 0.5);
@@ -168,6 +222,10 @@
             </div>
         </div>
     </div>
+
+    <!-- CUSTOM CURSOR ELEMENTS -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
 
     <!-- Progress Bar -->
     <div id="progress-bar" class="fixed top-0 left-0 h-1 bg-teal-500 dark:bg-teal-400 z-50 shadow-[0_0_15px_#00C2FF] transition-all duration-100" style="width: 0%"></div>
@@ -362,8 +420,7 @@
             </div>
         </div>
 
-        <!-- Full Bio Modal (Dark Theme Maintained for "Matrix" feel even in light mode, or adapted) -->
-        <!-- Let's keep modals dark for the "hacker" feel, or adapt. Adapting for consistency. -->
+        <!-- Full Bio Modal -->
         <div id="bio-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
             <div class="bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="bio-modal-content">
                 <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800">
@@ -410,7 +467,7 @@
             </div>
         </div>
 
-        <!-- Large Modals (kept dark-ish in JS content but containers adapted) -->
+        <!-- Large Modals -->
         <div id="web-pentest-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-opacity duration-300 opacity-0">
              <div class="bg-white dark:bg-slate-900 w-full max-w-6xl h-[90vh] rounded-xl border border-teal-500 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
                 <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
@@ -850,7 +907,60 @@
 
             // --- HACKER LOADER SEQUENCE ---
             initLoader();
+
+            // --- CUSTOM CURSOR INIT ---
+            initCustomCursor();
         });
+
+        // --- CUSTOM CURSOR LOGIC ---
+        function initCustomCursor() {
+            const dot = document.getElementById('cursor-dot');
+            const ring = document.getElementById('cursor-ring');
+            
+            // Mouse Movement
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX;
+                const posY = e.clientY;
+
+                // Dot follows instantly
+                dot.style.left = `${posX}px`;
+                dot.style.top = `${posY}px`;
+
+                // Ring follows with slight delay (simulated by CSS transition or simple animation)
+                // Using simple animation frame for smoother follow would be ideal, but CSS transition on left/top is heavy.
+                // Let's use animate() for performance
+                ring.animate({
+                    left: `${posX}px`,
+                    top: `${posY}px`
+                }, { duration: 500, fill: "forwards" });
+            });
+
+            // Hover Effects
+            // Select all interactive elements
+            const interactiveElements = document.querySelectorAll('a, button, input, textarea, select, .cursor-pointer, .group');
+            
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    document.body.classList.add('hover-active');
+                });
+                el.addEventListener('mouseleave', () => {
+                    document.body.classList.remove('hover-active');
+                });
+            });
+
+            // Re-bind for dynamically added elements (simple mutation observer logic simulated by interval or event delegation)
+            // Ideally, we use event delegation for robustness
+            document.body.addEventListener('mouseover', (e) => {
+                if (e.target.closest('a, button, input, textarea, select, .cursor-pointer')) {
+                    document.body.classList.add('hover-active');
+                }
+            });
+            document.body.addEventListener('mouseout', (e) => {
+                if (e.target.closest('a, button, input, textarea, select, .cursor-pointer')) {
+                    document.body.classList.remove('hover-active');
+                }
+            });
+        }
 
         // --- HACKER LOADER FUNCTION ---
         function initLoader() {
