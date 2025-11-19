@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asanul Hoque Esan | Cybersecurity Portfolio</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable manual dark mode toggle
+            theme: {
+                extend: {
+                    colors: {
+                        teal: {
+                            400: '#00C2FF',
+                            500: '#00A8E8',
+                            600: '#008ac0', // Darker teal for light mode text
+                            950: '#020617', // Custom deep slate
+                        },
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
+                        sans: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'marquee': 'marquee 60s linear infinite',
+                        'marquee-reverse': 'marqueeReverse 60s linear infinite',
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        },
+                        marqueeReverse: {
+                            '0%': { transform: 'translateX(-50%)' },
+                            '100%': { transform: 'translateX(0%)' },
+                        }
+                    },
+                    screens: {
+                        'xs': '475px',
+                        '3xl': '1600px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0; /* Light mode track */
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #0f172a; /* Dark mode track */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* Light mode thumb */
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #1e293b; /* Dark mode thumb */
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00C2FF; 
+        }
+
+        /* Utility classes */
+        .text-shadow-glow {
+            text-shadow: 0 0 10px rgba(0, 194, 255, 0.5);
+        }
+
+        /* Animation Pause on Hover */
+        .pause-hover:hover {
+            animation-play-state: paused;
+        }
+
+        /* HACKER LOADER STYLES */
+        #hacker-loader {
+            background: #020617;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+        }
+
+        #matrix-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.15;
+        }
+
+        .loader-content {
+            position: relative;
+            z-index: 20;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 2rem;
+            border: 1px solid rgba(0, 194, 255, 0.3);
+            box-shadow: 0 0 40px rgba(0, 194, 255, 0.1);
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 4px;
+        }
+        
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0, 194, 255, 0.05) 50%, rgba(0,0,0,0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+        }
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 font-sans selection:bg-teal-500/30 selection:text-teal-600 dark:selection:text-teal-200 overflow-x-hidden transition-colors duration-300">
+
+    <!-- HACKER LOADER SCREEN (Always Dark) -->
+    <div id="hacker-loader">
+        <canvas id="matrix-canvas"></canvas>
+        <div class="scanline"></div>
+        <div class="loader-content flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-teal-500/30 pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="terminal" class="w-4 h-4 text-teal-400"></i>
+                    <span class="text-xs font-bold text-teal-400 tracking-widest">SYSTEM_BOOT_SEQ</span>
+                </div>
+                <span class="text-[10px] text-slate-500 font-mono animate-pulse">ENCRYPTED_CONNECTION</span>
+            </div>
+            <div id="loader-text" class="text-xs sm:text-sm font-mono text-slate-300 whitespace-pre-wrap leading-relaxed h-24 overflow-hidden flex flex-col justify-end"></div>
+            <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800 mt-2">
+                <div id="loader-progress" class="h-full bg-teal-500 w-0 shadow-[0_0_10px_#00C2FF] transition-all duration-100 ease-out"></div>
+            </div>
+            <div class="flex justify-between text-[10px] font-mono text-teal-500/60">
+                <span>ID: 0x92F2...</span>
+                <span id="loader-percent">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div id="progress-bar" class="fixed top-0 left-0 h-1 bg-teal-500 dark:bg-teal-400 z-50 shadow-[0_0_15px_#00C2FF] transition-all duration-100" style="width: 0%"></div>
+
+    <!-- Background Elements (Dark Mode Only or Adjusted) -->
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-20">
+        <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(6,230,179,0.1),transparent_50%)]"></div>
+        <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_50%_50%,rgba(0,194,255,0.1),transparent_50%)]"></div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl 3xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2 group cursor-pointer" onclick="scrollToSection('STATUS')">
+                <i data-lucide="terminal" class="w-8 h-8 text-teal-600 dark:text-teal-400 group-hover:animate-pulse"></i>
+                <span class="text-xl font-bold tracking-tighter text-slate-900 dark:text-white">null<span class="text-teal-600 dark:text-teal-400">lynx</span></span>
+            </div>
+
+            <!-- Desktop Nav -->
+            <div class="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium tracking-widest relative" id="desktop-nav-container">
+                <!-- Nav Marker -->
+                <div id="nav-marker" class="absolute bottom-0 h-[2px] bg-teal-500 dark:bg-teal-400 shadow-[0_0_8px_#00C2FF] transition-all duration-300 ease-out rounded-full"></div>
+
+                <button onclick="scrollToSection('STATUS')" data-target="STATUS" class="desktop-nav-btn nav-link text-teal-600 dark:text-teal-400 relative py-2 transition-colors font-bold">STATUS</button>
+                <button onclick="scrollToSection('PROFILE')" data-target="PROFILE" class="desktop-nav-btn nav-link text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white relative py-2 transition-colors">PROFILE</button>
+                <button onclick="scrollToSection('ANALYSIS')" data-target="ANALYSIS" class="desktop-nav-btn nav-link text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white relative py-2 transition-colors">ANALYSIS</button>
+                <button onclick="scrollToSection('ACCOMPLISH')" data-target="ACCOMPLISH" class="desktop-nav-btn nav-link text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white relative py-2 transition-colors">ACCOMPLISH</button>
+                <button onclick="scrollToSection('DOCUMENTS')" data-target="DOCUMENTS" class="desktop-nav-btn nav-link text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white relative py-2 transition-colors">DOCUMENTS</button>
+                <button onclick="scrollToSection('ACCESS_LOG')" data-target="ACCESS_LOG" class="desktop-nav-btn nav-link text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white relative py-2 transition-colors">ACCESS_LOG</button>
+                <button onclick="scrollToSection('ENCRYPT')" data-target="ENCRYPT" class="desktop-nav-btn nav-link text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white relative py-2 transition-colors">ENCRYPT</button>
+                
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="ml-4 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-teal-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-300 dark:border-slate-700">
+                    <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+                    <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-orange-500"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-4 lg:hidden">
+                <!-- Theme Toggle Mobile -->
+                <button onclick="toggleTheme()" class="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-teal-400 border border-slate-300 dark:border-slate-700">
+                    <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="sun" class="w-5 h-5 block dark:hidden text-orange-500"></i>
+                </button>
+
+                <!-- Mobile Toggle -->
+                <button class="text-slate-900 dark:text-white focus:outline-none" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" id="menu-icon" class="w-8 h-8"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300">
+            <div class="flex flex-col p-6 gap-4">
+                <button onclick="scrollToSection('STATUS')" class="text-left py-3 border-l-2 px-4 border-teal-500 text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-400/10 text-lg font-medium">STATUS</button>
+                <button onclick="scrollToSection('PROFILE')" class="text-left py-3 border-l-2 px-4 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800">PROFILE</button>
+                <button onclick="scrollToSection('ANALYSIS')" class="text-left py-3 border-l-2 px-4 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800">ANALYSIS</button>
+                <button onclick="scrollToSection('ACCOMPLISH')" class="text-left py-3 border-l-2 px-4 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800">ACCOMPLISH</button>
+                <button onclick="scrollToSection('DOCUMENTS')" class="text-left py-3 border-l-2 px-4 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800">DOCUMENTS</button>
+                <button onclick="scrollToSection('ACCESS_LOG')" class="text-left py-3 border-l-2 px-4 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800">ACCESS_LOG</button>
+                <button onclick="scrollToSection('ENCRYPT')" class="text-left py-3 border-l-2 px-4 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-lg hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800">ENCRYPT</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. STATUS (HERO) -->
+    <section id="STATUS" class="min-h-screen flex items-center pt-20 relative z-10 overflow-hidden px-4 sm:px-6 group bg-slate-50 dark:bg-slate-950 transition-colors">
+        <div class="max-w-7xl 3xl:max-w-screen-2xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center w-full perspective-1000">
+            <!-- Left Content -->
+            <div class="fade-in-section opacity-0 transform translate-y-10 transition-all duration-700 group-hover:translate-x-2 text-center md:text-left relative z-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-100/50 dark:bg-teal-950/50 border border-teal-500/30 text-teal-600 dark:text-teal-400 text-xs font-mono mb-6 transition-all duration-500 group-hover:border-teal-400 group-hover:shadow-[0_0_15px_rgba(45,212,191,0.3)]">
+                    <!-- Green Bati -->
+                    <span class="relative flex h-3 w-3 mr-1">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 duration-75 group-hover:duration-300"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500 shadow-[0_0_10px_#4ade80] group-hover:shadow-[0_0_20px_#4ade80] transition-shadow"></span>
+                    </span>
+                    SYSTEM_ONLINE
+                </div>
+                <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-4 leading-tight transition-all duration-500">
+                    Asanul Hoque <br />
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500 dark:from-teal-400 dark:to-emerald-400 text-shadow-glow group-hover:brightness-125 transition-all">Esan</span>
+                </h1>
+                
+                <!-- Typing Effect Container -->
+                <div class="text-xl sm:text-2xl md:text-3xl font-mono text-slate-500 dark:text-slate-400 h-12 flex items-center justify-center md:justify-start mb-8">
+                    <span class="mr-2 text-teal-600 dark:text-teal-500 group-hover:text-teal-500 transition-colors">&gt;</span>
+                    <span id="typing-text" class="text-slate-700 dark:text-slate-300 transition-colors"></span><span class="animate-pulse text-teal-500">|</span>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <button onclick="scrollToSection('ENCRYPT')" class="w-full sm:w-auto px-8 py-3 bg-teal-500 dark:bg-teal-400 text-white dark:text-slate-950 font-bold rounded-lg hover:bg-teal-600 dark:hover:bg-teal-300 transition-all shadow-lg hover:-translate-y-1">
+                        Initialize Encrypt
+                    </button>
+                    <button onclick="scrollToSection('DOCUMENTS')" class="w-full sm:w-auto px-8 py-3 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:border-teal-500 hover:text-teal-600 dark:hover:text-teal-400 transition-all hover:bg-slate-100 dark:hover:bg-slate-900/50">
+                        View Logs
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Image -->
+            <div class="relative h-[600px] w-[340px] mx-auto hidden md:block fade-in-section opacity-0 transform scale-95 transition-all duration-700 delay-300 group-hover:-translate-x-2 group-hover:scale-105">
+                <div class="absolute inset-0 bg-teal-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10"></div>
+                <div class="absolute inset-0 bg-gradient-to-tr from-teal-500/20 to-transparent rounded-2xl transform rotate-3 transition-transform duration-700 group-hover:rotate-6"></div>
+                <div class="absolute inset-0 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl group transition-all duration-700 group-hover:border-teal-500/50 group-hover:shadow-[0_0_40px_rgba(0,194,255,0.2)]">
+                    <div class="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')] bg-cover bg-center opacity-50 grayscale group-hover:grayscale-0 transition-all duration-700 mix-blend-overlay"></div>
+                        <div class="z-10 text-center">
+                            <i data-lucide="shield" class="w-24 h-24 mx-auto text-teal-500/50 mb-4 transition-all duration-500 group-hover:text-teal-400 group-hover:scale-110"></i>
+                            <p class="font-mono text-sm group-hover:text-teal-600 dark:group-hover:text-teal-300 transition-colors">/img/profile_main.jpg</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PROFILE -->
+    <section id="PROFILE" class="py-16 md:py-24 bg-slate-100/50 dark:bg-slate-900/50 relative border-t border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl 3xl:max-w-screen-2xl mx-auto px-4 sm:px-6">
+            <!-- Section Title -->
+            <div class="mb-12 text-center relative z-10">
+                <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2">
+                    <span class="text-teal-600 dark:text-teal-400">./</span>PROFILE
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 font-mono text-sm tracking-widest uppercase">IDENTITY_VERIFIED</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-teal-500 to-emerald-400 mx-auto mt-4 rounded-full shadow-[0_0_10px_#00C2FF]"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
+                <!-- Image Column -->
+                <div class="md:col-span-5 flex flex-col items-center">
+                    
+                    <!-- Rainbow Wrapper -->
+                    <div class="relative mb-8 group">
+                         <div class="absolute -inset-3 rounded-full bg-[conic-gradient(from_0deg,#ff0000,#ff7f00,#ffff00,#00ff00,#0000ff,#4b0082,#9400d3,#ff0000)] animate-[spin_4s_linear_infinite] blur opacity-75"></div>
+                         <div class="absolute -inset-1 rounded-full bg-[conic-gradient(from_0deg,#ff0000,#ff7f00,#ffff00,#00ff00,#0000ff,#4b0082,#9400d3,#ff0000)] animate-[spin_4s_linear_infinite]"></div>
+    
+                         <!-- Profile Image Container -->
+                         <div class="relative w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-full p-1.5 bg-white dark:bg-slate-900 z-10">
+                            <div class="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden relative group cursor-pointer">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Profile" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500 transform hover:scale-110" />
+                            </div>
+                            <div class="absolute bottom-6 right-6 bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 p-3 rounded-full border border-teal-500/50 shadow-lg z-20">
+                                <i data-lucide="shield" class="w-6 h-6"></i>
+                            </div>
+                         </div>
+                    </div>
+
+                    <!-- UPDATED STATS -->
+                    <div class="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-md text-center">
+                        <div class="bg-white/80 dark:bg-slate-800/50 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm hover:border-teal-500/50 transition-all shadow-sm dark:shadow-none">
+                            <div class="text-xl sm:text-3xl font-bold text-slate-900 dark:text-white stat-number" data-target="350" data-suffix="+">0+</div>
+                            <div class="text-[10px] sm:text-xs text-teal-600 dark:text-teal-400 uppercase font-bold tracking-wider mt-1">Vulns</div>
+                        </div>
+                        <div class="bg-white/80 dark:bg-slate-800/50 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm hover:border-teal-500/50 transition-all shadow-sm dark:shadow-none">
+                            <div class="text-xl sm:text-3xl font-bold text-slate-900 dark:text-white stat-number" data-target="40" data-suffix="+">0+</div>
+                            <div class="text-[10px] sm:text-xs text-teal-600 dark:text-teal-400 uppercase font-bold tracking-wider mt-1">Clients</div>
+                        </div>
+                        <div class="bg-white/80 dark:bg-slate-800/50 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/50 backdrop-blur-sm hover:border-teal-500/50 transition-all shadow-sm dark:shadow-none">
+                            <div class="text-xl sm:text-3xl font-bold text-slate-900 dark:text-white stat-number" data-target="98" data-suffix="%">0%</div>
+                            <div class="text-[10px] sm:text-xs text-teal-600 dark:text-teal-400 uppercase font-bold tracking-wider mt-1">Success</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio Column -->
+                <div class="md:col-span-7 space-y-8 text-center md:text-left">
+                    <div class="prose prose-lg max-w-none">
+                        <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed font-light">
+                            I am a dedicated <span class="text-teal-600 dark:text-teal-400 font-semibold">Cybersecurity Professional</span> specializing in Penetration Testing and Vulnerability Assessment. With a hacker mindset and corporate discipline, I bridge the gap between critical infrastructure flaws and robust security postures.
+                        </p>
+                        <p class="text-slate-600 dark:text-slate-400 text-base sm:text-lg">
+                            My methodology involves rigorous reconnaissance, manual exploitation, and detailed reporting that not only highlights risks but provides actionable remediation strategies. I have successfully secured platforms ranging from fintech startups to Fortune 500 assets.
+                        </p>
+                        <p class="text-slate-600 dark:text-slate-400 text-base sm:text-lg">
+                            Beyond the terminal, I am an active community member, contributing to CTFs and mentoring the next generation of white-hat hackers.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-4 pt-4 justify-center md:justify-start">
+                        <button onclick="toggleModal('bio-modal')" class="group flex items-center gap-3 px-8 py-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-teal-600 dark:text-teal-400 border border-slate-200 dark:border-teal-500/30 rounded-lg transition-all w-full sm:w-auto justify-center shadow-sm hover:shadow-[0_0_20px_rgba(0,194,255,0.2)]">
+                            <i data-lucide="eye" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                            <span class="font-bold tracking-wide">INITIALIZE FULL BIO</span>
+                        </button>
+                        <button onclick="downloadResume()" class="group flex items-center gap-3 px-8 py-4 bg-teal-600 dark:bg-teal-600 hover:bg-teal-700 dark:hover:bg-teal-500 text-white rounded-lg shadow-lg shadow-teal-500/20 transition-all w-full sm:w-auto justify-center hover:shadow-teal-500/40 hover:-translate-y-1">
+                            <i data-lucide="download" class="w-5 h-5 group-hover:animate-bounce"></i>
+                            <span class="font-bold tracking-wide">DOWNLOAD RESUME</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Bio Modal (Dark Theme Maintained for "Matrix" feel even in light mode, or adapted) -->
+        <!-- Let's keep modals dark for the "hacker" feel, or adapt. Adapting for consistency. -->
+        <div id="bio-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+            <div class="bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="bio-modal-content">
+                <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-teal-500">
+                             <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-3">
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Asanul Hoque Esan</h3>
+                            <a href="https://www.linkedin.com/" target="_blank" class="flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950/30 border border-blue-300 dark:border-blue-500/30 text-blue-700 dark:text-blue-400 text-xs font-bold hover:bg-blue-600 hover:text-white hover:border-blue-400 transition-all duration-300 group">
+                                <i data-lucide="linkedin" class="w-3 h-3 group-hover:scale-110 transition-transform"></i>
+                                <span>LinkedIn</span>
+                            </a>
+                        </div>
+                    </div>
+                    <button onclick="toggleModal('bio-modal')" class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </div>
+                
+                <div class="p-8 overflow-y-auto font-mono text-sm text-slate-600 dark:text-slate-400 leading-loose scrollbar-thin">
+                    <p class="mb-6 text-teal-600 dark:text-teal-500 font-bold">-- BEGIN TRANSMISSION --</p>
+                    <div id="bio-text-content"></div>
+                    <p class="mt-6 text-teal-600 dark:text-teal-500 font-bold">-- END TRANSMISSION --</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. ANALYSIS -->
+    <section id="ANALYSIS" class="py-16 md:py-24 relative overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors">
+        <div class="mb-12 text-center relative z-10 px-4">
+            <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2">
+                <span class="text-teal-600 dark:text-teal-400">./</span>ANALYSIS
+            </h2>
+            <p class="text-slate-500 dark:text-slate-400 font-mono text-sm tracking-widest uppercase">KNOWLEDGE_BASE</p>
+            <div class="w-24 h-1 bg-gradient-to-r from-teal-500 to-emerald-400 mx-auto mt-4 rounded-full shadow-[0_0_10px_#00C2FF]"></div>
+        </div>
+
+        <!-- Analysis Modal -->
+        <div id="analysis-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onclick="closeAnalysisModal()">
+            <div class="bg-white dark:bg-slate-800 border border-teal-500 p-6 rounded-lg max-w-md w-full shadow-[0_0_50px_rgba(0,194,255,0.2)] transform transition-all scale-100" onclick="event.stopPropagation()">
+                <h3 id="modal-title" class="text-2xl font-bold text-teal-600 dark:text-teal-400 mb-2">Title</h3>
+                <div id="modal-desc" class="text-slate-600 dark:text-slate-300 mb-4 text-sm leading-relaxed">Description</div>
+                <span id="modal-tag" class="px-2 py-1 rounded text-xs font-bold hidden">Tag</span>
+            </div>
+        </div>
+
+        <!-- Large Modals (kept dark-ish in JS content but containers adapted) -->
+        <div id="web-pentest-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-opacity duration-300 opacity-0">
+             <div class="bg-white dark:bg-slate-900 w-full max-w-6xl h-[90vh] rounded-xl border border-teal-500 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
+                <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-teal-100 dark:bg-teal-500/20 rounded-lg flex items-center justify-center border border-teal-200 dark:border-teal-500/40">
+                            <i data-lucide="globe" class="text-teal-600 dark:text-teal-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">WEB PENTESTING DEEP DIVE</h3>
+                            <p class="text-xs text-teal-600 dark:text-teal-400 font-mono">DOCUMENT_SIZE: 5000+ WORDS // CLASSIFIED</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleModal('web-pentest-modal')" class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 p-2 rounded-full transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </div>
+                <div class="p-8 overflow-y-auto font-mono text-sm text-slate-600 dark:text-slate-300 leading-loose scrollbar-thin">
+                    <div id="web-pentest-content" class="max-w-4xl mx-auto"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="expertise-large-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl transition-opacity duration-300 opacity-0">
+             <div class="bg-white dark:bg-slate-900 w-full max-w-6xl h-[90vh] rounded-xl border border-purple-500 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
+                <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-500/20 rounded-lg flex items-center justify-center border border-purple-200 dark:border-purple-500/40">
+                            <i data-lucide="cpu" class="text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <div>
+                            <h3 id="expertise-modal-title" class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">EXPERTISE DEEP DIVE</h3>
+                            <p class="text-xs text-purple-600 dark:text-purple-400 font-mono">KNOWLEDGE_BASE: 5000+ WORDS // INDEXED</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleModal('expertise-large-modal')" class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 p-2 rounded-full transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </div>
+                <div class="p-8 overflow-y-auto font-mono text-sm text-slate-600 dark:text-slate-300 leading-loose scrollbar-thin">
+                    <div id="expertise-modal-content" class="max-w-4xl mx-auto"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-12">
+            <!-- Tools Row -->
+            <div class="relative group">
+                <h3 class="text-center text-teal-600 dark:text-teal-500 font-mono text-sm mb-4 flex items-center justify-center gap-2"><i data-lucide="code" class="w-4 h-4"></i> TOOLS_ARSENAL</h3>
+                <div class="flex overflow-hidden relative w-full mask-linear">
+                    <div class="absolute z-10 left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                    <div class="absolute z-10 right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                    <div class="flex gap-4 py-4 animate-marquee pause-hover w-max" id="tools-marquee"></div>
+                </div>
+            </div>
+
+            <!-- Vulns Row -->
+            <div class="relative group">
+                <h3 class="text-center text-teal-600 dark:text-teal-500 font-mono text-sm mb-4 flex items-center justify-center gap-2"><i data-lucide="shield" class="w-4 h-4"></i> KNOWN_VULNERABILITIES</h3>
+                <div class="flex overflow-hidden relative w-full">
+                     <div class="absolute z-10 left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                    <div class="absolute z-10 right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                    <div class="flex gap-4 py-4 animate-marquee-reverse pause-hover w-max" id="vulns-marquee"></div>
+                </div>
+            </div>
+
+            <!-- CORE EXPERTISE - Single Box -->
+             <div class="relative py-12 flex justify-center px-4">
+                 <div class="w-full max-w-3xl relative group cursor-pointer" onclick="openWebPentestModal()">
+                     <div class="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-400 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+                     <div class="relative bg-white dark:bg-slate-900 border-2 border-teal-500/50 hover:border-teal-400 rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 transition-all duration-300 hover:shadow-[0_0_40px_rgba(0,194,255,0.15)]">
+                         <div class="w-20 h-20 rounded-full bg-teal-100 dark:bg-teal-500/10 flex items-center justify-center border border-teal-500/30 shrink-0 group-hover:scale-110 transition-transform">
+                             <i data-lucide="globe" class="w-10 h-10 text-teal-600 dark:text-teal-400"></i>
+                         </div>
+                         <div class="text-center md:text-left flex-1">
+                             <div class="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3 mb-2">
+                                 <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">WEB PENTESTING</h3>
+                                 <span class="px-2 py-0.5 rounded bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400 text-xs font-bold border border-teal-500/30">CORE_SKILL</span>
+                             </div>
+                             <p class="text-slate-600 dark:text-slate-400 mb-4 leading-relaxed text-sm md:text-base">
+                                 Mastery in uncovering critical vulnerabilities including OWASP Top 10. Specialized in logic flaw detection, API security, and advanced exploitation techniques.
+                             </p>
+                             <div class="inline-flex items-center gap-2 text-teal-600 dark:text-teal-400 font-mono text-sm group-hover:underline underline-offset-4">
+                                 <span>CLICK_TO_VIEW_FULL_DETAILS</span>
+                                 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
+             <!-- Expertise Row -->
+             <div class="relative group">
+                <h3 class="text-center text-teal-600 dark:text-teal-500 font-mono text-sm mb-4 flex items-center justify-center gap-2"><i data-lucide="star" class="w-4 h-4"></i> MY_BEST_EXPERTISE</h3>
+                <div class="flex overflow-hidden relative w-full">
+                    <div class="absolute z-10 left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                    <div class="absolute z-10 right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                    <div class="flex gap-4 py-4 animate-marquee-reverse pause-hover w-max" id="expertise-marquee"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. ACCOMPLISH -->
+    <section id="ACCOMPLISH" class="py-16 md:py-24 bg-slate-100 dark:bg-slate-900/30">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="mb-12 text-center relative z-10">
+                <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2">
+                    <span class="text-teal-600 dark:text-teal-400">./</span>ACCOMPLISH
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 font-mono text-sm tracking-widest uppercase">HALL_OF_FAME</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-teal-500 to-emerald-400 mx-auto mt-4 rounded-full shadow-[0_0_10px_#00C2FF]"></div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 items-center" id="platform-grid">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="text-center mt-12">
+                <button id="toggle-platforms-btn" onclick="togglePlatforms()" class="px-8 py-2 border border-teal-500/30 text-teal-600 dark:text-teal-400 rounded-full hover:bg-teal-500/10 transition-all text-sm font-mono">
+                    LOAD_ALL_PLATFORMS [50+]
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. DOCUMENTS -->
+    <section id="DOCUMENTS" class="py-16 md:py-24 relative bg-slate-50 dark:bg-slate-950 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="mb-12 text-center relative z-10">
+                <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2">
+                    <span class="text-teal-600 dark:text-teal-400">./</span>DOCUMENTS
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 font-mono text-sm tracking-widest uppercase">CREDENTIALS_&_REPORTS</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-teal-500 to-emerald-400 mx-auto mt-4 rounded-full shadow-[0_0_10px_#00C2FF]"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Certifications -->
+                <div>
+                    <div class="flex justify-between items-end mb-6">
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2"><i data-lucide="award" class="text-teal-600 dark:text-teal-400"></i> Certifications</h3>
+                        <button onclick="toggleModal('cert-modal')" class="text-xs text-teal-600 dark:text-teal-400 hover:underline">View All (45)</button>
+                    </div>
+                    <div class="space-y-4 group" id="cert-preview-list">
+                        <!-- JS Injected -->
+                    </div>
+                </div>
+
+                <!-- Reports Scrolling -->
+                <div class="overflow-hidden">
+                    <h3 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6"><i data-lucide="file-text" class="text-teal-600 dark:text-teal-400"></i> Declassified Reports</h3>
+                    <div class="relative h-[400px] overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 group shadow-sm dark:shadow-none">
+                        <div class="absolute inset-0 pointer-events-none z-10 bg-gradient-to-b from-white dark:from-slate-900 via-transparent to-white dark:to-slate-900"></div>
+                        <div class="p-4 space-y-4 animate-[marquee_20s_linear_infinite] hover:[animation-play-state:paused] flex flex-col" style="animation-direction: normal; animation-name: scrollUp; height: max-content;">
+                             <div id="reports-list"></div>
+                             <div id="reports-list-dup"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cert Modal -->
+        <div id="cert-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 sm:p-8 opacity-0 transition-opacity duration-300">
+            <div class="bg-white dark:bg-slate-900 border border-teal-500 w-full max-w-4xl h-[80vh] rounded-xl p-6 sm:p-8 overflow-y-auto transform scale-95 transition-transform duration-300" id="cert-modal-content">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-4 mb-8">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">All Certifications</h2>
+                    <button onclick="toggleModal('cert-modal')" class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><i data-lucide="x"></i></button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="all-certs-grid">
+                    <!-- JS Injected -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. ACCESS LOG -->
+    <section id="ACCESS_LOG" class="py-16 md:py-24 bg-slate-100/50 dark:bg-slate-900/50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+            <div class="mb-12 text-center relative z-10">
+                <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2">
+                    <span class="text-teal-600 dark:text-teal-400">./</span>ACCESS_LOG
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 font-mono text-sm tracking-widest uppercase">SYSTEM_MONITORING</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-teal-500 to-emerald-400 mx-auto mt-4 rounded-full shadow-[0_0_10px_#00C2FF]"></div>
+            </div>
+            
+            <div class="bg-white dark:bg-black border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-lg dark:shadow-2xl font-mono text-sm">
+                <div class="bg-slate-50 dark:bg-slate-900 px-4 py-2 border-b border-slate-200 dark:border-slate-800 flex gap-4 text-slate-600 dark:text-slate-500 text-xs font-bold uppercase">
+                    <div class="w-24">Time</div>
+                    <div class="flex-1">Event</div>
+                    <div class="w-32 hidden md:block">Source IP</div>
+                    <div class="w-24">Status</div>
+                </div>
+                
+                <!-- Logs Container (Dynamic Content) -->
+                <div class="divide-y divide-slate-100 dark:divide-slate-900 h-[360px] overflow-y-auto scrollbar-thin" id="access-logs-container">
+                    <!-- JS Injected -->
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="px-4 py-3 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                    <button id="btn-prev-log" onclick="changeLogPage(-1)" class="flex items-center gap-2 px-4 py-2 rounded bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-300 dark:disabled:hover:border-slate-700">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i> PREVIOUS
+                    </button>
+                    
+                    <span id="log-page-indicator" class="text-xs text-slate-600 dark:text-slate-500 font-mono tracking-wider">PAGE 1 / 15</span>
+                    
+                    <button id="btn-next-log" onclick="changeLogPage(1)" class="flex items-center gap-2 px-4 py-2 rounded bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-300 dark:disabled:hover:border-slate-700">
+                        NEXT <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="px-4 py-2 bg-slate-100 dark:bg-slate-900/50 text-xs text-slate-500 dark:text-slate-600 animate-pulse border-t border-slate-200 dark:border-slate-900">
+                    Listening for new events...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. ENCRYPT -->
+    <section id="ENCRYPT" class="py-16 md:py-24 relative bg-slate-50 dark:bg-slate-950 transition-colors">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="mb-12 text-center relative z-10">
+                <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold text-slate-900 dark:text-white tracking-tighter mb-2">
+                    <span class="text-teal-600 dark:text-teal-400">./</span>ENCRYPT_TOOL
+                </h2>
+                <p class="text-slate-500 dark:text-slate-400 font-mono text-sm tracking-widest uppercase">CRYPTOGRAPHY_PLAYGROUND</p>
+                <div class="w-24 h-1 bg-gradient-to-r from-teal-500 to-emerald-400 mx-auto mt-4 rounded-full shadow-[0_0_10px_#00C2FF]"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <!-- Controls -->
+                <div class="md:col-span-4 space-y-6">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl">
+                        <label class="block text-slate-600 dark:text-slate-400 text-xs font-bold mb-2">ALGORITHM</label>
+                        <div class="relative">
+                            <select id="algo-select" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white p-3 rounded appearance-none focus:border-teal-500 outline-none">
+                                <!-- Options via JS -->
+                            </select>
+                            <div class="absolute right-3 top-3 pointer-events-none text-slate-500">▼</div>
+                        </div>
+
+                        <div class="flex gap-2 mt-4 p-1 bg-slate-100 dark:bg-slate-950 rounded">
+                            <button id="btn-encrypt" onclick="setEncryptionMode('ENCRYPT')" class="flex-1 py-2 text-xs font-bold rounded transition-all bg-teal-600 text-white shadow-lg">ENCRYPT</button>
+                            <button id="btn-decrypt" onclick="setEncryptionMode('DECRYPT')" class="flex-1 py-2 text-xs font-bold rounded transition-all text-slate-500 hover:text-slate-300">DECRYPT</button>
+                        </div>
+
+                        <div id="aes-strength-container" class="mt-6 hidden">
+                            <label class="block text-slate-600 dark:text-slate-400 text-xs font-bold mb-2">KEY_STRENGTH</label>
+                            <div class="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div id="aes-bar" class="h-full transition-all duration-500 bg-red-500" style="width: 0%"></div>
+                            </div>
+                            <div id="aes-text" class="text-right text-xs text-slate-500 mt-1">0% (Simulated)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input/Output -->
+                <div class="md:col-span-8 grid gap-6">
+                    <div class="group">
+                        <div class="flex justify-between mb-2">
+                            <label class="text-teal-600 dark:text-teal-400 text-xs font-bold">INPUT_DATA</label>
+                            <button onclick="document.getElementById('input-text').value=''; processEncryption();" class="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white">CLEAR</button>
+                        </div>
+                        <textarea id="input-text" oninput="processEncryption()" class="w-full h-32 bg-white/80 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700 rounded-lg p-4 text-slate-900 dark:text-slate-200 font-mono text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all resize-none placeholder:text-slate-400" placeholder="Enter data to process..."></textarea>
+                    </div>
+
+                    <div class="relative group">
+                        <div class="flex justify-between mb-2">
+                            <label class="text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
+                                OUTPUT_DATA 
+                                <span id="output-indicator" class="w-2 h-2 rounded-full bg-emerald-500 opacity-0 transition-opacity"></span>
+                            </label>
+                            <button onclick="copyOutput()" class="text-xs text-teal-600 dark:text-teal-500 hover:text-teal-800 dark:hover:text-white flex items-center gap-1">
+                                <i data-lucide="download" class="w-3 h-3"></i> COPY
+                            </button>
+                        </div>
+                        <div id="output-text" class="w-full h-32 bg-slate-50 dark:bg-black border border-slate-300 dark:border-slate-800 rounded-lg p-4 text-emerald-600 dark:text-emerald-500 font-mono text-sm overflow-y-auto relative break-all">
+                            <span class="text-slate-400 dark:text-slate-800">Waiting for input...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-100 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 pt-16 pb-8 transition-colors">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8 md:gap-12 mb-12">
+                <div class="col-span-1 md:col-span-2">
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">null<span class="text-teal-600 dark:text-teal-400">lynx</span></h2>
+                    <p class="text-slate-600 dark:text-slate-500 max-w-sm text-sm md:text-base">
+                        Securing the digital frontier one packet at a time. Available for freelance penetration testing and security consultation.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-slate-900 dark:text-white font-bold mb-4">CONTACT</h4>
+                    <ul class="space-y-2 text-slate-600 dark:text-slate-400 text-sm">
+                        <li class="flex items-center gap-2 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer"><i data-lucide="mail" class="w-4 h-4"></i> secure@nulllynx.com</li>
+                        <li class="flex items-center gap-2 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer"><i data-lucide="mail" class="w-4 h-4"></i> public@asanul.dev</li>
+                        <li class="flex items-center gap-2 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer"><i data-lucide="phone" class="w-4 h-4"></i> +1 (555) 010-9999</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-slate-900 dark:text-white font-bold mb-4">NETWORK</h4>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="#" class="w-8 h-8 bg-slate-200 dark:bg-slate-900 rounded flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white dark:hover:text-black transition-all"><i data-lucide="github" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 bg-slate-200 dark:bg-slate-900 rounded flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white dark:hover:text-black transition-all"><i data-lucide="linkedin" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 bg-slate-200 dark:bg-slate-900 rounded flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white dark:hover:text-black transition-all"><i data-lucide="twitter" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 bg-slate-200 dark:bg-slate-900 rounded flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white dark:hover:text-black transition-all"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 bg-slate-200 dark:bg-slate-900 rounded flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white dark:hover:text-black transition-all"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 bg-slate-200 dark:bg-slate-900 rounded flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white dark:hover:text-black transition-all"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 bg-slate-200 dark:bg-slate-900 rounded flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white dark:hover:text-black transition-all"><i data-lucide="message-circle" class="w-4 h-4"></i></a>
+                        <a href="#" class="w-8 h-8 bg-slate-200 dark:bg-slate-900 rounded flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white dark:hover:text-black transition-all"><i data-lucide="book-open" class="w-4 h-4"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-slate-500 dark:text-slate-700 text-xs font-mono border-t border-slate-200 dark:border-slate-900 pt-8">
+                © 2025 Asanul Hoque Esan. ALL RIGHTS RESERVED. SYSTEM_ID: 0x92F2
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Additional Animation Keyframes for vertical scroll */
+        @keyframes scrollUp {
+            0% { transform: translateY(0%); }
+            100% { transform: translateY(-50%); }
+        }
+    </style>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- THEME TOGGLE FUNCTION ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Check Local Storage for Theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- DATA ---
+        const TITLES = ["Hacker", "Bug Bounty Hunter", "CTF Player", "Pentester", "Security Researcher", "Critical Thinker"];
+        
+        const TOOLS = Array.from({ length: 50 }, (_, i) => ({
+            id: i, name: `Tool-X${i}`, icon: "🔧", details: "Advanced automation framework for reconnaissance."
+        }));
+
+        const VULNERABILITIES = Array.from({ length: 50 }, (_, i) => ({
+            id: i, name: `CVE-2025-${1000+i}`, severity: i % 3 === 0 ? "Critical" : "High", details: "Remote Code Execution via buffer overflow in legacy protocols."
+        }));
+
+        // UPDATED EXPERTISE DATA
+        const EXPERTISE_NAMES = [
+            "Network Security", "Web App Pentesting", "Cloud Security", "Reverse Engineering", 
+            "Malware Analysis", "Cryptography", "Social Engineering", "Digital Forensics", 
+            "IoT Security", "Mobile Security", "Red Teaming", "Blue Teaming", 
+            "DevSecOps", "API Security", "Wireless Security", "OSINT"
+        ];
+
+        const EXPERTISE = EXPERTISE_NAMES.map((name, i) => ({
+            id: i, name: name, details: `Advanced proficiency in ${name.toLowerCase()} methodologies and tools.`
+        }));
+
+        const PLATFORMS = [
+            { name: "HackerOne", rank: "Top 1%", points: "15000+", role: "Hacker" },
+            { name: "Bugcrowd", rank: "Top 50", points: "MVP", role: "Researcher" },
+            { name: "HackTheBox", rank: "Omniscient", points: "Guru", role: "CTF Player" },
+            { name: "TryHackMe", rank: "Top 1%", points: "God Mode", role: "Learner" },
+            { name: "PortSwigger", rank: "Certified", points: "Practitioner", role: "Analyst" },
+            ...Array.from({ length: 45 }, (_, i) => ({ name: `Platform ${i+6}`, rank: "Elite", points: "5000+", role: "User" }))
+        ];
+
+        const CERTS = [
+            { name: "OSCP", issuer: "OffSec", date: "2024" },
+            { name: "CISSP", issuer: "ISC2", date: "2023" },
+            { name: "CEH Master", issuer: "EC-Council", date: "2023" },
+            { name: "eWPTX", issuer: "eLearnSecurity", date: "2022" },
+            { name: "CRTP", issuer: "Altered Security", date: "2022" },
+            ...Array.from({ length: 40 }, (_, i) => ({ name: `Cert-${i+6}`, issuer: "CyberAuthority", date: "2021" }))
+        ];
+
+        // --- ACCESS LOGS DATA GENERATION (100 Items) ---
+        const EVENT_TYPES = [
+            "ROOT_ACCESS_GRANTED", "SQL_INJECTION_DETECTED", "SYSTEM_UPDATE_INIT", 
+            "BRUTE_FORCE_ATTEMPT", "DATA_EXFIL_TEST", "PORT_SCAN_DETECTED", 
+            "SSH_LOGIN_SUCCESS", "FIREWALL_RULE_UPDATE", "MALWARE_SIGNATURE_MATCH", 
+            "API_KEY_LEAK_DETECTED", "XSS_PAYLOAD_BLOCKED"
+        ];
+        const STATUSES = ["SUCCESS", "BLOCKED", "COMPLETE", "MITIGATED", "SIMULATED", "WARNING", "CRITICAL"];
+
+        // Generate 100 Logs sorted by time (newest first logic simulated)
+        const ACCESS_LOGS = Array.from({ length: 100 }, (_, i) => {
+            const h = Math.floor(Math.random() * 24).toString().padStart(2, '0');
+            const m = Math.floor(Math.random() * 60).toString().padStart(2, '0');
+            const s = Math.floor(Math.random() * 60).toString().padStart(2, '0');
+            return {
+                time: `${h}:${m}:${s}`,
+                event: EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)],
+                ip: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+                status: STATUSES[Math.floor(Math.random() * STATUSES.length)]
+            };
+        }).sort((a, b) => b.time.localeCompare(a.time));
+
+        const ENCRYPTION_ALGOS = [
+            "Base64", "Hex", "Rot13", "Reverse", "Binary", "Caesar Cipher", "URL Encode", "HTML Entity", "MD5 (Hash)", "SHA-256 (Hash)", "AES-128 (Sim)", "AES-256 (Sim)", "RSA (Sim)"
+        ];
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initTypewriter();
+            renderMarquees();
+            renderPlatforms(false);
+            renderCerts();
+            renderLogs(); // Initial render
+            initEncryption();
+            renderBio();
+            renderWebPentestDetails();
+            
+            // Trigger initial nav state
+            updateNavHighlight();
+            
+            // Initialize Stats Animation
+            initStatsAnimation();
+
+            // --- HACKER LOADER SEQUENCE ---
+            initLoader();
+        });
+
+        // --- HACKER LOADER FUNCTION ---
+        function initLoader() {
+            const loader = document.getElementById('hacker-loader');
+            const textField = document.getElementById('loader-text');
+            const progress = document.getElementById('loader-progress');
+            const percent = document.getElementById('loader-percent');
+            
+            // Matrix Rain Logic
+            const canvas = document.getElementById('matrix-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const nums = '0123456789';
+            const alphabet = katakana + latin + nums;
+            
+            const fontSize = 16;
+            const columns = canvas.width/fontSize;
+            
+            const rainDrops = [];
+            for( let x = 0; x < columns; x++ ) {
+                rainDrops[x] = 1;
+            }
+            
+            const draw = () => {
+                ctx.fillStyle = 'rgba(2, 6, 23, 0.1)'; // Slight trail effect
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00C2FF'; // Teal text
+                ctx.font = fontSize + 'px monospace';
+                
+                for(let i = 0; i < rainDrops.length; i++)
+                {
+                    const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                    ctx.fillText(text, i*fontSize, rainDrops[i]*fontSize);
+                    
+                    if(rainDrops[i]*fontSize > canvas.height && Math.random() > 0.975){
+                        rainDrops[i] = 0;
+                    }
+                    rainDrops[i]++;
+                }
+            };
+            
+            const matrixInterval = setInterval(draw, 30);
+
+
+            // Typing Logic
+            const lines = [
+                "> INITIALIZING KERNEL...",
+                "> CHECKING SYSTEM INTEGRITY...",
+                "> LOADING SECURITY MODULES...",
+                "> BYPASSING FIREWALL...",
+                "> DECRYPTING ASSETS...",
+                "> ESTABLISHING SECURE CONNECTION...",
+                "> ACCESS GRANTED."
+            ];
+            
+            let lineIndex = 0;
+            
+            function typeLine() {
+                if (lineIndex < lines.length) {
+                    const line = lines[lineIndex];
+                    const p = document.createElement('div');
+                    p.className = "mb-1";
+                    p.textContent = line;
+                    textField.appendChild(p);
+                    
+                    // Auto scroll to bottom
+                    textField.scrollTop = textField.scrollHeight;
+
+                    lineIndex++;
+                    
+                    // Progress Bar Logic
+                    const progressPercent = Math.round(((lineIndex) / lines.length) * 100);
+                    progress.style.width = progressPercent + "%";
+                    percent.innerText = progressPercent + "%";
+
+                    setTimeout(typeLine, 400); // Delay between lines
+                    
+                } else {
+                    // Sequence Finished
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        loader.style.pointerEvents = 'none';
+                        clearInterval(matrixInterval);
+                        setTimeout(() => {
+                           loader.style.display = 'none'; 
+                        }, 500);
+                    }, 800);
+                }
+            }
+            
+            // Start Sequence
+            typeLine();
+        }
+
+        // --- STATS COUNTING ANIMATION ---
+        function initStatsAnimation() {
+            const stats = document.querySelectorAll('.stat-number');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Start Animation
+                        const target = parseInt(entry.target.getAttribute('data-target'));
+                        const suffix = entry.target.getAttribute('data-suffix') || '';
+                        animateValue(entry.target, 0, target, 2000, suffix);
+                    } else {
+                        // Reset Animation
+                        const suffix = entry.target.getAttribute('data-suffix') || '';
+                        entry.target.innerText = "0" + suffix;
+                    }
+                });
+            }, { threshold: 0.5 }); // Trigger when 50% visible
+
+            stats.forEach(stat => observer.observe(stat));
+        }
+
+        function animateValue(obj, start, end, duration, suffix) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start) + suffix;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // --- NAVIGATION & SCROLL ---
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+                closeMobileMenu();
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Scroll & Nav Highlight Logic
+        const sections = document.querySelectorAll("section");
+        const navBtns = document.querySelectorAll(".desktop-nav-btn");
+        const navMarker = document.getElementById("nav-marker");
+
+        function updateNavHighlight() {
+            // 1. Update Progress Bar
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progress-bar').style.width = scrolled + "%";
+
+            // 2. Fade In Animations
+            document.querySelectorAll('.fade-in-section').forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 100) {
+                    el.classList.remove('opacity-0', 'translate-y-10', 'scale-95');
+                }
+            });
+
+            // 3. Active Section & Moving Line
+            let current = "";
+            
+            // Detect current section (with offset for header)
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                // 100px offset ensures we highlight a bit before reaching top
+                if (window.scrollY >= sectionTop - 150) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            // Handle case where we are at top but STATUS (first sec) might be small or we want default
+            if(window.scrollY < 200) current = "STATUS";
+
+            navBtns.forEach((btn) => {
+                // Reset color (Standard Slate for inactive)
+                btn.classList.remove("text-teal-600", "dark:text-teal-400");
+                btn.classList.add("text-slate-600", "dark:text-slate-400");
+
+                if (btn.getAttribute("data-target") === current) {
+                    // Set Active Color (Teal)
+                    btn.classList.add("text-teal-600", "dark:text-teal-400");
+                    btn.classList.remove("text-slate-600", "dark:text-slate-400");
+
+                    // Move Marker
+                    if(navMarker && btn) {
+                        navMarker.style.width = `${btn.offsetWidth}px`;
+                        navMarker.style.left = `${btn.offsetLeft}px`;
+                        // Ensure opacity is 1
+                        navMarker.style.opacity = "1";
+                    }
+                }
+            });
+        }
+
+        // Attach listener
+        window.addEventListener("scroll", updateNavHighlight);
+        // Update on resize too (width changes)
+        window.addEventListener("resize", updateNavHighlight);
+
+
+        // --- TYPING EFFECT ---
+        let titleIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        
+        function initTypewriter() {
+            const typeSpeed = isDeleting ? 50 : 100;
+            const currentTitle = TITLES[titleIndex];
+            const element = document.getElementById('typing-text');
+
+            if (!isDeleting && charIndex <= currentTitle.length) {
+                element.innerText = currentTitle.substring(0, charIndex);
+                charIndex++;
+            } else if (isDeleting && charIndex >= 0) {
+                element.innerText = currentTitle.substring(0, charIndex);
+                charIndex--;
+            }
+
+            if (charIndex === currentTitle.length + 1) {
+                isDeleting = true;
+                setTimeout(initTypewriter, 2000); // Pause at end
+                return;
+            }
+            
+            if (charIndex === 0 && isDeleting) {
+                isDeleting = false;
+                titleIndex = (titleIndex + 1) % TITLES.length;
+            }
+
+            setTimeout(initTypewriter, typeSpeed);
+        }
+
+        // --- RENDERING MARQUEES ---
+        function renderMarquees() {
+            // Tools (UPDATED DESIGN: Glassmorphism & Glow)
+            const toolsContainer = document.getElementById('tools-marquee');
+            const toolHTML = TOOLS.map(t => `
+                <div onclick="openAnalysisDeepDive('${t.name}', 'TOOL')" class="group w-64 h-24 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 hover:border-teal-500 rounded-xl p-4 flex items-center gap-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_0_25px_rgba(0,194,255,0.2)] shrink-0 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="text-3xl bg-slate-100 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800 group-hover:border-teal-500/50 transition-colors z-10">${t.icon}</div>
+                    <div class="z-10 overflow-hidden">
+                        <div class="text-slate-800 dark:text-slate-200 font-bold text-sm truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">${t.name}</div>
+                        <div class="text-xs text-slate-500 truncate mt-1 group-hover:text-slate-600 dark:group-hover:text-slate-400">Click for Deep Dive</div>
+                    </div>
+                </div>
+            `).join('');
+            toolsContainer.innerHTML = toolHTML + toolHTML; // Duplicate for infinite scroll
+
+            // Vulns (UPDATED DESIGN: Severity Highlight & Progress Bar)
+            const vulnsContainer = document.getElementById('vulns-marquee');
+            const vulnsHTML = VULNERABILITIES.map(v => `
+                <div onclick="openAnalysisDeepDive('${v.name}', 'VULNERABILITY')" class="group w-80 h-28 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 hover:border-red-500 rounded-xl p-5 flex flex-col justify-center cursor-pointer transition-all duration-300 hover:scale-105 hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_0_25px_rgba(239,68,68,0.2)] shrink-0 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="flex justify-between items-center mb-2 z-10">
+                        <span class="text-slate-800 dark:text-slate-200 font-bold text-sm group-hover:text-black dark:group-hover:text-white transition-colors">${v.name}</span>
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${v.severity === 'Critical' ? 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30' : 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-500/30'}">${v.severity}</span>
+                    </div>
+                    <div class="text-xs text-slate-500 truncate z-10 group-hover:text-slate-600 dark:group-hover:text-slate-400">${v.details}</div>
+                    <div class="mt-3 w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden z-10">
+                        <div class="h-full bg-gradient-to-r ${v.severity === 'Critical' ? 'from-red-600 to-red-400' : 'from-orange-600 to-orange-400'} w-1/2 group-hover:w-full transition-all duration-700 ease-out"></div>
+                    </div>
+                </div>
+            `).join('');
+            vulnsContainer.innerHTML = vulnsHTML + vulnsHTML;
+
+            // Expertise (UPDATED DESIGN: Premium Tech Card with Animation)
+            const expContainer = document.getElementById('expertise-marquee');
+            const expHTML = EXPERTISE.map(e => `
+                <div onclick="openExpertiseModal('${e.name}')" class="group w-72 h-24 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 hover:border-teal-500/50 rounded-xl p-4 flex items-center justify-between cursor-pointer transition-all duration-500 hover:scale-105 hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_0_30px_rgba(0,194,255,0.15)] shrink-0 relative overflow-hidden">
+                     
+                     <!-- Hover Gradient Background -->
+                     <div class="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                     
+                     <!-- Animated Corner Borders -->
+                     <div class="absolute top-0 right-0 w-0 h-[2px] bg-teal-400 group-hover:w-full transition-all duration-700"></div>
+                     <div class="absolute bottom-0 left-0 w-0 h-[2px] bg-purple-400 group-hover:w-full transition-all duration-700"></div>
+
+                     <div class="flex items-center gap-4 z-10">
+                        <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 group-hover:border-teal-500/50 flex items-center justify-center transition-all duration-300 group-hover:rotate-12 shadow-lg">
+                            <i data-lucide="layers" class="w-5 h-5 text-slate-500 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-slate-700 dark:text-slate-300 font-bold text-sm group-hover:text-slate-900 dark:group-hover:text-white transition-colors">${e.name}</h4>
+                            <p class="text-[10px] text-slate-500 group-hover:text-teal-600/70 dark:group-hover:text-teal-400/70 font-mono mt-0.5">VERIFIED_SKILL</p>
+                        </div>
+                     </div>
+                     
+                     <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0 text-teal-600 dark:text-teal-400">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                     </div>
+                </div>
+            `).join('');
+            expContainer.innerHTML = expHTML + expHTML;
+        }
+
+        // --- ANALYSIS MODAL (Standard) ---
+        function openAnalysisModal(title, desc, tag) {
+            document.getElementById('modal-title').innerText = title;
+            // Use innerHTML to support lists from Web Pentest details
+            document.getElementById('modal-desc').innerHTML = desc;
+            const tagEl = document.getElementById('modal-tag');
+            
+            if (tag) {
+                tagEl.classList.remove('hidden');
+                tagEl.innerText = tag;
+                tagEl.className = `px-2 py-1 rounded text-xs font-bold ${tag === 'Critical' ? 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400' : 'bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400'}`;
+            } else {
+                tagEl.classList.add('hidden');
+            }
+            
+            const modal = document.getElementById('analysis-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAnalysisModal() {
+            const modal = document.getElementById('analysis-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // NEW FUNCTION FOR TOOLS & VULNS DEEP DIVE
+        function openAnalysisDeepDive(title, type) {
+            const modalTitle = document.getElementById('expertise-modal-title');
+            const modalContent = document.getElementById('expertise-modal-content');
+            
+            modalTitle.innerText = `${title} - ${type} ANALYSIS`;
+            
+            let html = '';
+            
+            if (type === 'TOOL') {
+                html += `<h2 class="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-6">Advanced Tool Documentation: ${title}</h2>`;
+                const toolModules = ["Installation & Configuration", "Basic Usage Syntax", "Advanced Exploitation Modules", "Evasion & Obfuscation", "Scripting & Automation", "Integration with C2 Frameworks"];
+                
+                toolModules.forEach((mod, i) => {
+                    html += `<div class="mb-8">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">${i+1}. ${mod}</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+                            Utilizing <strong>${title}</strong> for ${mod.toLowerCase()} requires precision. We leverage custom configurations to bypass standard detection mechanisms. 
+                            The module allows for granular control over packet structures and timing, essential for stealthy operations in hardened environments.
+                        </p>
+                        <div class="bg-slate-100 dark:bg-black p-4 rounded border border-slate-200 dark:border-slate-800 font-mono text-xs text-emerald-600 dark:text-emerald-400">
+                            $ ${title.toLowerCase()} --module ${mod.split(' ')[0].toLowerCase()} --target 192.168.x.x --stealth-mode
+                        </div>
+                    </div>`;
+                });
+            } else {
+                // Vulnerability
+                html += `<h2 class="text-3xl font-bold text-red-600 dark:text-red-400 mb-6">Vulnerability Deep Dive: ${title}</h2>`;
+                const vulnSections = ["Technical Description", "Attack Vectors", "Impact Analysis", "Proof of Concept (Simulated)", "Remediation Strategy", "CVSS Score Breakdown"];
+                
+                vulnSections.forEach((sec, i) => {
+                    html += `<div class="mb-8">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">${i+1}. ${sec}</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+                            In the context of <strong>${title}</strong>, the ${sec.toLowerCase()} phase involves rigorous analysis. 
+                            Attackers exploit this flaw by manipulating input vectors to trigger unintended behavior in the backend logic.
+                            Critical systems are often compromised due to lack of input sanitization or improper access controls associated with this vulnerability.
+                        </p>
+                         ${i === 3 ? `<div class="bg-slate-100 dark:bg-black p-4 rounded border-l-4 border-red-500 font-mono text-xs text-slate-700 dark:text-slate-300">
+                            GET /api/v1/user?id=1 OR 1=1; -- <br>
+                            > HTTP/1.1 200 OK <br>
+                            > { "admin": true, "data": "SENSITIVE_LEAK" }
+                        </div>` : ''}
+                    </div>`;
+                });
+            }
+
+            html += `<div class="my-8 border-t border-slate-200 dark:border-slate-800 pt-8"><h3 class="text-slate-500 font-bold mb-4">REFERENCES & CVE DATABASE</h3></div>`;
+            for(let j=0; j<5; j++) {
+                 html += `<p class="text-slate-500 dark:text-slate-600 text-xs font-mono mb-1">REF_DOC_${5000+j}: ${title}_technical_paper_v${j}.pdf [AVAILABLE]</p>`;
+            }
+
+            modalContent.innerHTML = html;
+            toggleModal('expertise-large-modal');
+        }
+
+        // Special function for the Web Pentest Card - OPEN LARGE MODAL
+        function openWebPentestModal() {
+            toggleModal('web-pentest-modal');
+        }
+
+        // NEW FUNCTION FOR GENERIC EXPERTISE LARGE MODAL
+        function openExpertiseModal(title) {
+            const modalTitle = document.getElementById('expertise-modal-title');
+            const modalContent = document.getElementById('expertise-modal-content');
+            
+            modalTitle.innerText = `${title.toUpperCase()} - ADVANCED PROTOCOLS`;
+            
+            let html = `<h2 class="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-6">Comprehensive Guide to ${title}</h2>`;
+            
+            // Simulated Chapters
+            const chapters = [
+                "Theoretical Foundations", "Architecture & Design Patterns", "Threat Modeling", 
+                "Exploitation Vectors", "Defense Mechanisms", "Advanced Tooling", 
+                "Case Studies & Forensics", "Compliance & Standards", "Future Trends", "Execution Strategy"
+            ];
+
+            chapters.forEach((chap, i) => {
+                html += `<div class="mb-8">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Module ${i+1}: ${chap}</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                        In the context of <strong>${title}</strong>, mastering ${chap.toLowerCase()} is critical for ensuring robust security postures. 
+                        We explore the intricacies of how these systems interact with modern infrastructure. 
+                        The attack surface in this domain is constantly evolving, requiring a proactive approach to identify anomalies before they escalate.
+                    </p>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Advanced practitioners leverage custom scripts and automated frameworks to audit ${chap.toLowerCase()}. 
+                        However, manual verification remains the gold standard. 
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+                        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                     <div class="mt-4 p-4 bg-purple-50 dark:bg-slate-800/50 rounded border-l-2 border-purple-500">
+                        <p class="text-purple-700 dark:text-purple-300 text-xs font-mono">NOTE: Critical dependencies in ${chap} must be isolated to prevent lateral movement during a breach.</p>
+                    </div>
+                </div>`;
+            });
+
+            html += `<div class="my-8 border-t border-slate-200 dark:border-slate-800 pt-8"><h3 class="text-purple-600 dark:text-purple-400 font-bold mb-4">SYSTEM LOGS & REFERENCES</h3></div>`;
+            
+            for(let j=0; j<15; j++) {
+                 html += `<p class="text-slate-500 dark:text-slate-600 text-xs font-mono mb-1">REF_ID_${1000+j}: ${title}_module_${j}_verified.hash [OK]</p>`;
+            }
+
+            modalContent.innerHTML = html;
+            toggleModal('expertise-large-modal');
+        }
+
+        // Function to render huge text for web pentest
+        function renderWebPentestDetails() {
+            const container = document.getElementById('web-pentest-content');
+            let html = `<h2 class="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-6">Advanced Web Application Penetration Testing Protocol</h2>`;
+            
+            const topics = [
+                "Reconnaissance & OSINT", "Scanning & Enumeration", "Authentication Flaws", 
+                "Authorization (IDOR/PrivEsc)", "Injection Attacks (SQLi/XSS)", "XML External Entities (XXE)",
+                "Insecure Deserialization", "Component Analysis", "API Security Testing", "Reporting & Remediation"
+            ];
+
+            topics.forEach((topic, i) => {
+                html += `<div class="mb-8">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">${i+1}. ${topic}</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                        In the domain of ${topic}, a deep understanding of the underlying architectural patterns is paramount. 
+                        We begin by analyzing the attack surface, identifying potential entry points that deviate from standard security practices.
+                        Advanced techniques involve manual payload crafting to bypass WAFs and filters. 
+                        Securing modern web applications requires a holistic approach that transcends simple vulnerability scanning. 
+                        Our methodology integrates automated discovery with rigorous manual validation to uncover complex logical flaws often missed by tools.
+                    </p>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Furthermore, persistent testing of ${topic} often reveals subtle logic flaws. 
+                        By chaining vulnerabilities, we demonstrate critical impact. 
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    </p>
+                </div>`;
+            });
+            
+            html += `<div class="my-8 border-t border-slate-200 dark:border-slate-800 pt-8"><h3 class="text-teal-600 dark:text-teal-400 font-bold mb-4">EXTENDED ANALYSIS LOGS (SAMPLE DATA)</h3></div>`;
+            
+            for(let j=0; j<10; j++) {
+                 html += `<p class="text-slate-500 font-mono text-xs mb-2">Log Entry 0x${200+j}: Analyzing HTTP headers for security misconfigurations... [PASS]</p>`;
+                 html += `<p class="text-slate-500 font-mono text-xs mb-2">Log Entry 0x${300+j}: Fuzzing API endpoints for unhandled exceptions... [VULN_DETECTED]</p>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // --- ACCOMPLISH SECTION ---
+        let platformsExpanded = false;
+        function renderPlatforms(expanded) {
+            const grid = document.getElementById('platform-grid');
+            const items = expanded ? PLATFORMS : PLATFORMS.slice(0, 5);
+            
+            grid.innerHTML = items.map((p, idx) => {
+                const isMiddle = idx === 2 && !expanded;
+                return `
+                <div onclick="openAccomplishModal('${p.name}', '${p.rank}', '${p.points}', '${p.role}')" 
+                     class="relative bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl p-6 border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center transition-all duration-500 cursor-pointer group 
+                     hover:border-teal-400 hover:shadow-[0_0_30px_rgba(0,194,255,0.25)] hover:-translate-y-2 overflow-hidden
+                     ${isMiddle ? 'md:scale-110 md:z-10 shadow-2xl border-teal-500/50 bg-white dark:bg-slate-800' : 'hover:scale-105'}">
+                     
+                     <!-- Hover Gradient Overlay -->
+                     <div class="absolute inset-0 bg-gradient-to-b from-teal-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                     
+                     <!-- Animated Icon Container -->
+                     <div class="relative z-10 w-14 h-14 bg-slate-100 dark:bg-slate-950 rounded-2xl mb-4 flex items-center justify-center text-teal-600 dark:text-teal-500 border border-slate-200 dark:border-slate-800 group-hover:border-teal-500/50 group-hover:text-white group-hover:bg-teal-500 transition-all duration-500 shadow-lg group-hover:shadow-teal-500/40 group-hover:rotate-6">
+                        <i data-lucide="globe" class="w-7 h-7"></i>
+                     </div>
+                     
+                     <div class="relative z-10 w-full">
+                         <h3 class="font-bold text-slate-900 dark:text-white mb-1 text-lg group-hover:text-teal-600 dark:group-hover:text-teal-300 transition-colors">${p.name}</h3>
+                         <p class="text-teal-600 dark:text-teal-400 text-xs font-bold mb-3 tracking-widest uppercase group-hover:text-teal-700 dark:group-hover:text-teal-200 transition-colors">${p.rank}</p>
+                         
+                         <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent my-3 group-hover:via-teal-500/50 transition-colors"></div>
+                         
+                         <div class="flex justify-between w-full text-xs text-slate-500 dark:text-slate-400 font-mono">
+                            <span class="group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">${p.role}</span>
+                            <span class="group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">${p.points} pts</span>
+                         </div>
+                     </div>
+                </div>
+            `}).join('');
+            lucide.createIcons();
+        }
+
+        function togglePlatforms() {
+            platformsExpanded = !platformsExpanded;
+            renderPlatforms(platformsExpanded);
+            document.getElementById('toggle-platforms-btn').innerText = platformsExpanded ? "COLLAPSE_DATA" : "LOAD_ALL_PLATFORMS [50+]";
+        }
+
+        // NEW FUNCTION FOR ACCOMPLISH MODAL
+        function openAccomplishModal(name, rank, points, role) {
+            const title = name.toUpperCase() + " ACHIEVEMENT";
+            // Create a search link based on the platform name (since we don't have exact URLs for all)
+            const link = `https://www.google.com/search?q=${name}+cybersecurity+platform`;
+            
+            const desc = `
+                <div class="space-y-6">
+                    <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                        Detailed performance metrics and recognition earned on <strong>${name}</strong>. 
+                        Consistently demonstrating expertise through CTF challenges, bug bounties, and active community contributions.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="bg-slate-100 dark:bg-slate-950 p-4 rounded border border-slate-200 dark:border-slate-800">
+                            <span class="text-slate-500 block text-xs mb-1">CURRENT RANKING</span>
+                            <span class="text-teal-600 dark:text-teal-400 font-bold text-xl">${rank}</span>
+                        </div>
+                        <div class="bg-slate-100 dark:bg-slate-950 p-4 rounded border border-slate-200 dark:border-slate-800">
+                            <span class="text-slate-500 block text-xs mb-1">TOTAL POINTS</span>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-bold text-xl">${points}</span>
+                        </div>
+                        <div class="bg-slate-100 dark:bg-slate-950 p-4 rounded border border-slate-200 dark:border-slate-800 col-span-2 flex justify-between items-center">
+                            <div>
+                                <span class="text-slate-500 block text-xs mb-1">ROLE / BADGE</span>
+                                <span class="text-slate-900 dark:text-white font-mono font-bold">${role}</span>
+                            </div>
+                            <i data-lucide="award" class="text-yellow-500 w-8 h-8"></i>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <a href="${link}" target="_blank" class="flex items-center justify-center gap-2 w-full py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition-all shadow-lg hover:shadow-teal-500/25 group">
+                            <i data-lucide="external-link" class="w-4 h-4 group-hover:rotate-45 transition-transform"></i> 
+                            VISIT PROFILE
+                        </a>
+                        <p class="text-center text-slate-500 dark:text-slate-600 text-xs mt-2">Redirects to external platform page</p>
+                    </div>
+                </div>
+            `;
+            
+            openAnalysisModal(title, desc, "VERIFIED");
+            // Re-render icons inside the modal content
+            setTimeout(() => lucide.createIcons(), 50);
+        }
+
+        // --- DOCUMENTS SECTION ---
+        function renderCerts() {
+            // Preview List (UPDATED: Interactive & Highlighted Cards)
+            const previewList = document.getElementById('cert-preview-list');
+            previewList.innerHTML = CERTS.slice(0, 5).map(c => `
+                <div onclick="openCertDeepDive('${c.name}', '${c.issuer}', '${c.date}')" 
+                     class="group relative bg-white/50 dark:bg-slate-800/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer transition-all duration-300 
+                            hover:border-teal-400 hover:shadow-[0_0_20px_rgba(0,194,255,0.15)] hover:-translate-y-1 overflow-hidden">
+                     
+                     <!-- Hover Gradient -->
+                     <div class="absolute inset-0 bg-gradient-to-r from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                     
+                     <div class="flex justify-between items-center relative z-10">
+                         <div class="flex items-center gap-4">
+                            <div class="p-2 bg-slate-100 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 group-hover:border-teal-500/50 group-hover:text-teal-600 dark:group-hover:text-teal-400 text-slate-400 transition-colors">
+                                <i data-lucide="award" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-black dark:group-hover:text-white text-lg transition-colors">${c.name}</h4>
+                                <p class="text-xs text-slate-500 group-hover:text-teal-600/80 dark:group-hover:text-teal-400/80 transition-colors">${c.issuer}</p>
+                            </div>
+                         </div>
+                         <span class="text-xs font-mono bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded text-slate-500 dark:text-slate-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:border-teal-500/30 transition-all">${c.date}</span>
+                     </div>
+                </div>
+            `).join('');
+
+            // Reports (UPDATED: Clickable Links)
+            const reportHTML = Array.from({length:10}).map((_,i) => `
+                 <a href="https://hackerone.com/" target="_blank" class="block bg-white/50 dark:bg-slate-800/50 p-4 rounded border border-slate-200 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-teal-500/50 transition-all cursor-pointer group shadow-sm dark:shadow-none">
+                     <div class="flex justify-between mb-2">
+                        <span class="text-teal-600 dark:text-teal-400 font-mono text-xs group-hover:text-teal-500 dark:group-hover:text-teal-300 transition-colors">RPT-2024-${800+i}</span>
+                        <span class="text-xs text-slate-500 flex items-center gap-1 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                            VIEW_REPORT <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </span>
+                     </div>
+                     <h4 class="text-slate-800 dark:text-slate-200 font-bold mb-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">IDOR in User Authentication Flow</h4>
+                     <p class="text-xs text-slate-500 line-clamp-2 group-hover:text-slate-600 dark:group-hover:text-slate-400">Discovered insecure direct object reference allowing unauthorized access to admin panels.</p>
+                </a>
+            `).join('');
+            document.getElementById('reports-list').innerHTML = reportHTML;
+            document.getElementById('reports-list-dup').innerHTML = reportHTML;
+
+            // All Certs Modal
+            document.getElementById('all-certs-grid').innerHTML = CERTS.map(c => `
+                <div class="bg-white dark:bg-slate-800 p-4 rounded border border-slate-200 dark:border-slate-700 hover:border-teal-400">
+                    <h4 class="font-bold text-teal-600 dark:text-teal-400">${c.name}</h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">${c.issuer}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-600 mt-2">${c.date}</p>
+                </div>
+            `).join('');
+
+            // Re-render icons for the new content
+            lucide.createIcons();
+        }
+
+        // NEW FUNCTION FOR CERT DEEP DIVE
+        function openCertDeepDive(name, issuer, date) {
+            const title = `CERTIFICATION: ${name}`;
+            const desc = `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 mb-4 p-4 bg-slate-100 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <i data-lucide="check-circle" class="text-teal-600 dark:text-teal-400 w-8 h-8"></i>
+                        <div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">ISSUED BY</p>
+                            <p class="text-slate-900 dark:text-white font-bold text-lg">${issuer}</p>
+                        </div>
+                        <div class="ml-auto text-right">
+                            <p class="text-sm text-slate-500 dark:text-slate-400">YEAR</p>
+                            <p class="text-slate-900 dark:text-white font-mono">${date}</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                        This certification validates advanced proficiency in cybersecurity methodologies. 
+                        The curriculum covers rigorous practical assessments, requiring hands-on exploitation 
+                        of vulnerabilities in controlled environments. Achieving <strong>${name}</strong> 
+                        demonstrates a commitment to professional excellence and technical mastery.
+                    </p>
+
+                    <h4 class="text-teal-600 dark:text-teal-400 font-bold text-sm mt-4 mb-2">KEY VALIDATED SKILLS:</h4>
+                    <ul class="grid grid-cols-2 gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-3 h-3 text-teal-500"></i> Network Security</li>
+                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-3 h-3 text-teal-500"></i> Vulnerability Analysis</li>
+                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-3 h-3 text-teal-500"></i> Exploitation Frameworks</li>
+                        <li class="flex items-center gap-2"><i data-lucide="chevron-right" class="w-3 h-3 text-teal-500"></i> Report Writing</li>
+                    </ul>
+                </div>
+            `;
+            
+            openAnalysisModal(title, desc, "VERIFIED CREDENTIAL");
+            setTimeout(() => lucide.createIcons(), 50);
+        }
+
+        // --- ACCESS LOGS PAGINATION ---
+        let currentLogPage = 1;
+        const LOGS_PER_PAGE = 7;
+
+        function renderLogs() {
+            const container = document.getElementById('access-logs-container');
+            
+            // Calculate slice range
+            const start = (currentLogPage - 1) * LOGS_PER_PAGE;
+            const end = start + LOGS_PER_PAGE;
+            const logsToShow = ACCESS_LOGS.slice(start, end);
+            
+            container.innerHTML = logsToShow.map(log => {
+                let statusColor = 'text-gray-400';
+                if (log.status === 'SUCCESS' || log.status === 'COMPLETE') statusColor = 'text-emerald-600 dark:text-emerald-400';
+                else if (log.status === 'BLOCKED' || log.status === 'MITIGATED') statusColor = 'text-teal-600 dark:text-teal-400';
+                else if (log.status === 'CRITICAL' || log.status === 'WARNING') statusColor = 'text-red-600 dark:text-red-400';
+                else if (log.status === 'SIMULATED') statusColor = 'text-yellow-600 dark:text-yellow-400';
+
+                return `
+                <div class="relative px-4 py-3 flex gap-4 transition-all duration-300 group border-l-2 border-transparent hover:border-teal-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:shadow-[inset_0_0_20px_rgba(0,194,255,0.05)] cursor-crosshair animate-fade-in overflow-hidden">
+                   
+                   <!-- Hover Gradient Overlay -->
+                   <div class="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+                   <div class="w-24 text-slate-500 font-mono text-xs pt-1 group-hover:text-teal-600/80 dark:group-hover:text-teal-500/80 transition-colors relative z-10">${log.time}</div>
+                   <div class="flex-1 text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors font-bold text-xs pt-1 relative z-10">${log.event}</div>
+                   <div class="w-32 hidden md:block text-slate-500 font-mono text-xs pt-1 relative z-10">${log.ip}</div>
+                   <div class="w-24 font-bold text-xs pt-1 ${statusColor} relative z-10 group-hover:brightness-125 transition-all">[${log.status}]</div>
+                </div>
+            `}).join('');
+
+            // Update Buttons
+            const totalPages = Math.ceil(ACCESS_LOGS.length / LOGS_PER_PAGE);
+            const btnPrev = document.getElementById('btn-prev-log');
+            const btnNext = document.getElementById('btn-next-log');
+            const pageIndicator = document.getElementById('log-page-indicator');
+
+            btnPrev.disabled = currentLogPage === 1;
+            btnNext.disabled = currentLogPage === totalPages;
+            
+            pageIndicator.innerText = `PAGE ${currentLogPage} / ${totalPages}`;
+            
+            // Simple fade animation class
+            container.classList.remove('opacity-0');
+            void container.offsetWidth; // trigger reflow
+            container.classList.add('opacity-100');
+        }
+
+        function changeLogPage(direction) {
+            const totalPages = Math.ceil(ACCESS_LOGS.length / LOGS_PER_PAGE);
+            const newPage = currentLogPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentLogPage = newPage;
+                renderLogs();
+            }
+        }
+
+        // --- ENCRYPTION ---
+        let encryptMode = 'ENCRYPT';
+
+        function initEncryption() {
+            const select = document.getElementById('algo-select');
+            ENCRYPTION_ALGOS.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a;
+                opt.innerText = a;
+                select.appendChild(opt);
+            });
+        }
+
+        function setEncryptionMode(mode) {
+            encryptMode = mode;
+            const btnEnc = document.getElementById('btn-encrypt');
+            const btnDec = document.getElementById('btn-decrypt');
+            
+            if(mode === 'ENCRYPT') {
+                btnEnc.classList.add('bg-teal-600', 'text-white', 'shadow-lg');
+                btnEnc.classList.remove('text-slate-500');
+                btnDec.classList.remove('bg-teal-600', 'text-white', 'shadow-lg');
+                btnDec.classList.add('text-slate-500');
+            } else {
+                btnDec.classList.add('bg-teal-600', 'text-white', 'shadow-lg');
+                btnDec.classList.remove('text-slate-500');
+                btnEnc.classList.remove('bg-teal-600', 'text-white', 'shadow-lg');
+                btnEnc.classList.add('text-slate-500');
+            }
+            processEncryption();
+        }
+
+        function processEncryption() {
+            const input = document.getElementById('input-text').value;
+            const algo = document.getElementById('algo-select').value;
+            const outputEl = document.getElementById('output-text');
+            const indicator = document.getElementById('output-indicator');
+            const aesContainer = document.getElementById('aes-strength-container');
+
+            if(input.length > 0) {
+                indicator.classList.remove('opacity-0');
+            } else {
+                indicator.classList.add('opacity-0');
+                outputEl.innerHTML = '<span class="text-slate-400 dark:text-slate-800">Waiting for input...</span>';
+                aesContainer.classList.add('hidden');
+                return;
+            }
+
+            // Key strength simulation for AES
+            if (algo.includes('AES')) {
+                aesContainer.classList.remove('hidden');
+                const strength = Math.min(100, input.length * 5);
+                const bar = document.getElementById('aes-bar');
+                bar.style.width = strength + '%';
+                bar.className = `h-full transition-all duration-500 ${strength < 30 ? 'bg-red-500' : strength < 70 ? 'bg-yellow-500' : 'bg-emerald-500'}`;
+                document.getElementById('aes-text').innerText = strength + '% (Simulated)';
+            } else {
+                aesContainer.classList.add('hidden');
+            }
+
+            let res = '';
+            try {
+                if (algo === 'Base64') {
+                    res = encryptMode === 'ENCRYPT' ? btoa(input) : atob(input);
+                } else if (algo === 'Rot13') {
+                    res = input.replace(/[a-zA-Z]/g, (c) => {
+                        const base = c <= 'Z' ? 65 : 97;
+                        return String.fromCharCode(base + (c.charCodeAt(0) - base + 13) % 26);
+                    });
+                } else if (algo === 'Reverse') {
+                     res = input.split('').reverse().join('');
+                } else {
+                     res = encryptMode === 'ENCRYPT' 
+                     ? `[${algo}_ENCRYPTED]::${btoa(input).substring(0, 10)}...` 
+                     : `[${algo}_DECRYPTED_SIM]::${input}`;
+                }
+            } catch (e) {
+                res = "ERROR: Invalid Input for this Algorithm";
+            }
+
+            outputEl.innerText = res;
+        }
+
+        function copyOutput() {
+            const text = document.getElementById('output-text').innerText;
+            navigator.clipboard.writeText(text);
+        }
+
+        // --- BIO GENERATION ---
+        function renderBio() {
+            const container = document.getElementById('bio-text-content');
+            let html = '';
+            for(let i=0; i<20; i++) {
+                const chapter = ['ORIGIN', 'AWAKENING', 'FIRST_SHELL', 'THE_NETWORK', 'ZERO_DAY'][i % 5];
+                html += `
+                <div class="mb-8">
+                    <h4 class="text-slate-900 dark:text-white font-bold mb-2">CHAPTER ${i+1}: ${chapter}</h4>
+                    <p>
+                      In the expansive digital frontier, security is not a product but a process. My journey began analyzing packet dumps in a dimly lit room... 
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    </p>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // --- GENERAL MODALS ---
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            const content = modal.querySelector('div'); // inner content container
+            
+            if (modal.classList.contains('hidden')) {
+                // Open
+                modal.classList.remove('hidden');
+                // small delay to allow display:block to apply before opacity transition
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }, 10);
+            } else {
+                // Close
+                modal.classList.add('opacity-0');
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // --- RESUME DOWNLOAD FUNCTION ---
+        function downloadResume() {
+            const resumeContent = `
+ASANUL HOQUE ESAN
+Cybersecurity Professional | Pentester | Security Researcher
+
+CONTACT
+--------------------------------------------------
+Email: secure@nulllynx.com
+Phone: +1 (555) 010-9999
+LinkedIn: linkedin.com/in/asanul-hoque-esan
+GitHub: github.com/nulllynx
+
+SUMMARY
+--------------------------------------------------
+Dedicated Cybersecurity Professional specializing in Penetration Testing and Vulnerability Assessment. 
+With a hacker mindset and corporate discipline, I bridge the gap between critical infrastructure flaws 
+and robust security postures.
+
+EXPERIENCE
+--------------------------------------------------
+Security Researcher | NullLynx (2020 - Present)
+- Conducted comprehensive penetration tests for 40+ clients.
+- Discovered and reported over 350 vulnerabilities.
+- Specialized in Web Application Security and Network Pentesting.
+
+Bug Bounty Hunter | HackerOne & Bugcrowd
+- Recognized in Hall of Fame for multiple programs.
+- Secured Top 1% ranking on major platforms.
+
+SKILLS
+--------------------------------------------------
+- Web Penetration Testing (OWASP Top 10)
+- Network Security & Infrastructure Auditing
+- Vulnerability Assessment & Management
+- Tools: Burp Suite, Metasploit, Nmap, Wireshark, Python
+
+CERTIFICATIONS
+--------------------------------------------------
+- OSCP (OffSec Certified Professional) - 2024
+- CISSP (Certified Information Systems Security Professional) - 2023
+- CEH Master (Certified Ethical Hacker) - 2023
+
+(This is a demo resume generated by the portfolio website)
+            `;
+            
+            const blob = new Blob([resumeContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Asanul_Hoque_Esan_Resume_Demo.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+    </script>
+</body>
+</html>
